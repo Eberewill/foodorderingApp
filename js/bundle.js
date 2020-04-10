@@ -875,7 +875,7 @@ var PayForm = React.createClass({displayName: "PayForm",
                 type: "number", 
                 valueLink: this.linkState('cardnum'), 
                 placeholder: "Credit Card Number", 
-                disabled: true}), 
+                disabled: false}), 
               React.createElement("input", {className: "third", name: "exprymonth", 
                 type: "number", 
                 min: "01", 
@@ -1037,7 +1037,7 @@ var FoodCollection = Backbone.Collection.extend({
 });
 
 var CompleteOrder = Backbone.Model.extend({
-  urlRoot: 'http://tiny-lasagna-server.herokuapp.com/collections/mtorders',
+  urlRoot: 'http://willscafe-6fb2c.web.app/api/v1/orders',
   idAttribute: '_id',
 });
 
@@ -1046,7 +1046,7 @@ var Order = Backbone.Model.extend({
 });
 
 var OrderCollection = Backbone.Collection.extend({
-  url: 'http://tiny-lasagna-server.herokuapp.com/collections/mtorders',
+  url: 'http://willscafe-6fb2c.web.app/api/v1/orders',
   model: Order
 });
 
