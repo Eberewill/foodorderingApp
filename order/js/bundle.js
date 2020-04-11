@@ -1035,7 +1035,7 @@ var FoodCollection = Backbone.Collection.extend({
 });
 
 var CompleteOrder = Backbone.Model.extend({
-  urlRoot: "http://willscafe-6fb2c.web.app/api/v1/orders",
+  urlRoot: "http://tiny-lasagna-server.herokuapp.com/collections/mtorders",
   idAttribute: '_id',
 });
 
@@ -1044,7 +1044,7 @@ var Order = Backbone.Model.extend({
 });
 
 var OrderCollection = Backbone.Collection.extend({
-  url: "http://willscafe-6fb2c.web.app/api/v1/orders",
+  url: "http://tiny-lasagna-server.herokuapp.com/collections/mtorders",
   model: Order
 });
 
