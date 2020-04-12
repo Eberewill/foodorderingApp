@@ -802,7 +802,10 @@ var PayForm = React.createClass({displayName: "PayForm",
       { order: this.props.order.toJSON() },
       { customer: _.omit(this.state, 'preparing', 'prepared', 'delivering', 'delivered') },
       { status: _.pick(this.state, 'preparing', 'prepared', 'delivering', 'delivered') } );
-    var completeOrder = new CompleteOrder( order );
+	var completeOrder = new CompleteOrder( order );
+	console.log("----------------------")
+	console.log(this.state.totalPrice)
+	localStorage.setItem("order", JSON.stringify(order)),
     completeOrder.save();
     this.props.resetOrder();
     Backbone.history.navigate( 'track', {trigger: true });
@@ -915,15 +918,90 @@ module.exports = PayForm;
 "use strict";
 var React = require('react');
 
-var ThaiTracker = React.createClass({displayName: "ThaiTracker",
+var OrderOption = React.createClass({displayName: "OrderOption",
   render: function(){
     return (
-      React.createElement("div", {className: "container-fluid order-holder"}, 
-        React.createElement("div", null, "User Order Tracking Page")
+      React.createElement("div", {className: "item-option item-info"}, 
+         "- ", this.props.option
       )
     );
   }
 });
+
+var OrderItem = React.createClass({displayName: "OrderItem",
+  render: function(){
+    var model = this.props.model;
+    var options = '';
+    var optKey = 0;
+    if(model.options){
+      options = model.options.map(function(option){
+        optKey += 1;
+        return ( React.createElement(OrderOption, {option: option, key: optKey}));
+      });
+    }
+    var suffix = '';
+    if(model.numOrdered != 1){
+      suffix = 's'
+    }
+    return (
+      React.createElement("tr", {className: "order-info"}, 
+        React.createElement("td", {className: "item-numOrdered item-info"}, model.numOrdered, " order  ", suffix, "  "), 
+		React.createElement("th", {className: "item-title item-info"}, model.title), 
+        React.createElement("td", {className: "item-options item-info"}, 
+          options
+        )
+      )
+    );
+  }
+});
+
+
+var ThaiTracker =  React.createClass({displayName: "ThaiTracker",
+render: function(){
+
+	var order = JSON.parse(localStorage.getItem('order'));
+	 var orderKey = 0;
+	 var orderobj = order.order;
+	var orderItems = orderobj.map(function(model){
+		orderKey += 1;
+		return ( React.createElement( OrderItem, {model: model, key:  orderKey }) );
+	  })
+	
+   return (
+React.createElement("div", {className: "container-fluid info-holder"}, 
+ console.log(order),
+	   React.createElement("div", {className: "info-abs"}, 
+		 React.createElement("div", {className: "row"}, 
+		   React.createElement("div", {id: "infotainer"}, 
+			 React.createElement("div", {className: "infotainer-header"}, 
+			   React.createElement("div", {className: "info-header-block"}, 
+				 React.createElement("div", {className: "info-header-constrain constrain-contact"}, 
+				   React.createElement("h4", {className: "info-header-title"}, "Your Order Details"), 
+				   React.createElement("div", {className: "info-header-body"}, 
+					 React.createElement("div", {className: "divider"}), 
+
+					 React.createElement("div", {id: "order-detail"}, 
+
+					 React.createElement("div", {id: "order-customer-info"}, 
+          			React.createElement("div", {className: "customer-name customer"}, "Name: ", order.customer.firstname, " ", order.customer.lastname), 
+          			React.createElement("div", {className: "customer-phone customer"}, "Contact Number: ", order.customer.phone), 
+          			React.createElement("div", {className: "customer-address customer"}, "Address: ", order.customer.addressln1, " ", order.customer.city, " ", order.customer.st, " ", order.customer.zip), 
+          			React.createElement("div", {className: "customer-email customer"}, "Email: ", order.customer.email),
+					 React.createElement("div", {className: "divider"}), 
+					 React.createElement("div", {id: "order-order-info"}, 
+          			React.createElement("table", null, orderItems)
+        			),
+
+					  )),
+				   )
+				 )
+			   )
+			 )
+		 )
+	   )
+   )
+));
+}});
 
 module.exports = ThaiTracker;
 

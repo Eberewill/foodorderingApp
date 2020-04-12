@@ -5837,7 +5837,7 @@ body {
   height: 100%; }
 
 #bg {
-  background: url("../images/thai-bowl.jpg") center center fixed; }
+  background: url("../images/of.jpg") center center fixed; }
 
 #bg-overlay {
   background-color: rgba(255, 255, 255, 0.5); }
@@ -5848,7 +5848,7 @@ body {
   width: 100%; }
 
 #order-bg {
-  background: url("../images/thai-bowl-2.jpg") center center fixed;
+  background: url("../images/of.jpg") center center fixed;
   opacity: 1; }
 
 #item-bg {
@@ -5951,12 +5951,12 @@ body {
 
 .info-header-block {
   position: relative;
-  float: left;
-  width: 50%;
+  float: none;
+  width: 100%;
   min-height: 1px;
   padding-left: 15px;
   padding-right: 15px;
-  text-align: center; }
+  text-align: left; }
 
 .info-header-constrain {
   background: rgba(255, 255, 255, 0.75);
