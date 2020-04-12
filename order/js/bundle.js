@@ -524,7 +524,7 @@ var SidebarDetail = React.createClass({displayName: "SidebarDetail",
           options
         ), 
         React.createElement("div", {className: "item-detail-bottom"}, 
-          React.createElement("span", {className: "item-price"}, "$",  Number(price).toFixed(2), " x ", model.get('numOrdered'), " = $",  Number(total).toFixed(2) )
+          React.createElement("span", {className: "item-price"}, "₦",  Number(price).toFixed(2), " x ", model.get('numOrdered'), " = $",  Number(total).toFixed(2) )
         )
       )
     );
@@ -561,7 +561,7 @@ var OrderSidebar = React.createClass({displayName: "OrderSidebar",
     }, 0 );
     var buttonClass;
     if(totalPrice){
-      totalPrice = '$' + Number(totalPrice).toFixed(2);
+      totalPrice = '₦' + Number(totalPrice).toFixed(2);
       buttonClass = "submit-order";
     }else{
       totalPrice = '';
@@ -718,7 +718,7 @@ var MenuDetail = React.createClass({displayName: "MenuDetail",
             options
           ), 
           React.createElement("div", {className: "options-right"}, 
-            React.createElement("span", {className: "item-price"}, "$",  Number(price).toFixed(2), " x "), 
+            React.createElement("span", {className: "item-price"}, "₦",  Number(price).toFixed(2), " x "), 
               React.createElement("input", {
                 className: "num-to-order", 
                 type: "number", min: "1", max: "10", 
@@ -803,25 +803,28 @@ var PayForm = React.createClass({displayName: "PayForm",
       { customer: _.omit(this.state, 'preparing', 'prepared', 'delivering', 'delivered') },
       { status: _.pick(this.state, 'preparing', 'prepared', 'delivering', 'delivered') } );
 	var completeOrder = new CompleteOrder( order );
-	console.log("----------------------")
-	console.log(this.state.totalPrice)
+	
+	
 	localStorage.setItem("order", JSON.stringify(order)),
     completeOrder.save();
     this.props.resetOrder();
-    Backbone.history.navigate( 'track', {trigger: true });
+	Backbone.history.navigate( 'track', {trigger: true });
+	
   },
-  
   render: function(){
     if(this.props.order){
       var date = new Date();
-      date = date.getFullYear();
+	  date = date.getFullYear();
+	
       var totalPrice = this.props.order.reduce(function(memo, model){
         var pricePer = Number(model.get('price'));
         var numOrdered = Number(model.get('numOrdered'));
         var totalPer = numOrdered * pricePer;
-        return memo + totalPer;
-      }, 0 );
+		return memo + totalPer;
+		
+	  }, 0 );
       return (
+
         React.createElement("div", {className: "container pay-form"}, 
           React.createElement("div", {className: "row"}, 
             React.createElement("h3", {className: null}, React.createElement("div", null, "Provide Delivery Address "), 
@@ -869,7 +872,9 @@ var PayForm = React.createClass({displayName: "PayForm",
                 placeholder: "Additional requests or information for the delivery driver."}), 
              
 				React.createElement("h3", {className: "sixth pct"}, "Total :" ), 
-              React.createElement("h4", {className: "sixth pct"}, "$",  (totalPrice ) ), 
+			  React.createElement("h4", {className: "sixth pct"}, "₦",  (totalPrice ) ), 
+			  localStorage.setItem("totalPrice", totalPrice),
+			  
 
 			  React.createElement("h5", {className: "warning"}, "we are not recieving online payment now" ), 
               React.createElement("input", {name: "cardnum", 
@@ -918,6 +923,7 @@ module.exports = PayForm;
 "use strict";
 var React = require('react');
 
+
 var OrderOption = React.createClass({displayName: "OrderOption",
   render: function(){
     return (
@@ -960,13 +966,13 @@ var ThaiTracker =  React.createClass({displayName: "ThaiTracker",
 render: function(){
 
 	var order = JSON.parse(localStorage.getItem('order'));
+	var totalPrice = localStorage.getItem('totalPrice')
 	 var orderKey = 0;
 	 var orderobj = order.order;
 	var orderItems = orderobj.map(function(model){
 		orderKey += 1;
 		return ( React.createElement( OrderItem, {model: model, key:  orderKey }) );
 	  })
-	
    return (
 React.createElement("div", {className: "container-fluid info-holder"}, 
  console.log(order),
@@ -989,10 +995,13 @@ React.createElement("div", {className: "container-fluid info-holder"},
           			React.createElement("div", {className: "customer-email customer"}, "Email: ", order.customer.email),
 					 React.createElement("div", {className: "divider"}), 
 					 React.createElement("div", {id: "order-order-info"}, 
-          			React.createElement("table", null, orderItems)
+          			React.createElement("div", null, orderItems)
         			),
 
 					  )),
+
+					  React.createElement("div", {className: "divider"}), 
+					  React.createElement("div", {className: "customer-email customer"}, "Total: ", " ₦ "," ", totalPrice),
 				   )
 				 )
 			   )
@@ -1008,60 +1017,60 @@ module.exports = ThaiTracker;
 },{"react":480}],12:[function(require,module,exports){
 "use strict";
 var data = [
-  {"id": "100", "title": "Soda", "type": "beverages", "price": "2.5", "options": [["Coke", "Sprite", "Pepsi", "haven"]]},
-  {"id": "101", "title": "Thai Coffee", "type": "beverages", "price": "4" },
-  {"id": "102", "title": "Juice", "type": "beverages", "price": "3", "options": [["Apple", "Orange", "Grape"]]},
-  {"id": "103", "title": "Water", "type": "beverages", "price": "3" },
-  {"id": "104", "title": "Shiitake Spring Rolls", "type": "starters", "description": "Deep-fried spring rolls stuffed with glass noodles, shiitake mushrooms and minced vegetables. Served with pineapple carrot sauce.", "price": "4.5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "105", "title": "Sesame Tofu", "type": "starters", "description": "Deep-fried sesame crusted tofu. Served with crushed peanuts in a sweet chili dipping sauce.", "price": "5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "106", "title": "Curry Puffs", "type": "starters", "description": "Siamese pastry stuffed with ground chicken, potatoes, onions, green peas and curry powder. Served with a light sour sauce.", "price": "6", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "107", "title": "Chicken Satay", "type": "starters", "description": "Grilled marinated chicken. Served with the house peanut sauce.", "price": "6.5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "108", "title": "Jeeb Dumplings", "type": "starters", "description": "Steamed mixed chicken and shrimp, served with house chili soy sauce.", "price": "5.5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "109", "title": "Green Leaf Dumplings", "type": "starters", "description": "Spinach and mixed vegetables. Served with house chili soy sauce.", "price": "5.5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "110", "title": "Chive Cakes", "type": "starters", "description": "Guiy-chaih. Fried Asian chive cakes. Served with black sweet ginger sauce.", "price": "6", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "111", "title": "Ba-Jangh", "type": "starters", "description": "Steamed sticky rice stuffed with soy beans, chestnuts, shiitake mushrooms, pork and Thai sausage wrapped in bamboo leaves. Served with black sweet ginger sauce.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "112", "title": "Shrimp Summer Rolls", "type": "starters", "description": "Poh-pieh-puuh. Steam shrimp, steamed bean sprout and shredded egg omelet served with tamarind hoisin sauce.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "113", "title": "Spicy Mango Soft Shell Crab", "type": "starters", "description": "Mieng-puuh. Served with red onions, mango, cherry tomatoes, roasted coconut, ginger and mint in chili lime dressing.", "price": "9", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "114", "title": "Fiery Thai Beef Tartare", "type": "starters", "description": "Larb-koiy. Steamed black sticky rice topped with freshly seasoned beef, chili and lime juice.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "115", "title": "Coconut Calamari", "type": "starters", "description": "Fried coconut crusted calamari, served with sweet chili sauce.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "116", "title": "Blanketed Shrimp", "type": "starters", "description": "Crispy blanketed shrimp and garlic chicken, served with pineapple-carrot sauce.", "price": "6.5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "117", "title": "Assorted Golden Fritters", "type": "starters", "description": "Crispy chicken and shrimp dumpling, shiitake spring rolls, blanketed shrimp and sesame tofu sticks. Served with crushed peanut sweet chili sauce.", "price": "8", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "118", "title": "Tom Yum Soup", "type": "soups", "description": "Tom yum. A street-style savory sour soup with mushrooms, traditionally seasoned with lemongrass, kaffir lime leaves, light coconut milk, chili and lime juice.", "price": "5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "119", "title": "Herbs Stewed Beef Soup", "type": "soups", "description": "Gauw-lauw-neur-tunh-yah-jean. Braised beef, bok choy, bean sprouts, goji berries and Asian herbs in Thai cinnamon soy sauce soup.", "price": "6.5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "120", "title": "Galangal Coconut Milk Soup", "type": "soups", "description": "Tom kha. A distinct flavor of southern Thailand's coconut soup with mushrooms seasoned with galangal and lime juice.", "price": "5.5", "options": [["Mild", "Medium", "Hot"]]},
-  {"id": "121", "title": "Thai Salad", "type": "salads", "description": "Mixed market greens with bean sprouts, tomatoes, onions and fried tofu, served with light peanut sauce dressing.", "price": "6", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
-  {"id": "122", "title": "Green Papaya Salad", "type": "salads", "description": "Cherry tomatoes, string beans and ground roasted peanuts with chili lime dressing.", "price": "6.5", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
-  {"id": "123", "title": "Crispy Duck Salad", "type": "salads", "description": "Lettuce, cashew nuts, pineapple, red onions and tomatoes with chili lime dressing.", "price": "8.5", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
-  {"id": "124", "title": "Crispy Mock Duck Salad", "type": "salads", "description": "Lettuce, cashew nuts, pineapples, red onions, tomatoes and chili lime dressing.", "price": "8.5", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
-  {"id": "125", "title": "Avocado Mango Salad", "type": "salads", "description": "With red onions, roasted coconut, cashew nuts and fried shallots in chili lime dressing.", "price": "9", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
-  {"id": "126", "title": "Beef Salad", "type": "salads", "description": "Slices of herb-marinated grilled steak tossed in lime juice, tomatoes, red onions, scallions and a bit of chili in roasted chili paste dressing.", "price": "8", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
-  {"id": "127", "title": "Bangkok Fried Rice", "type": "fried rice", "description": "Traditional fried rice with scallions, onions, tomatoes, green peas, carrots and eggs. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "128", "title": "Spicy Basil Fried Rice", "type": "fried rice", "description": "Fried rice Kee-Maow's style with peppers, onions, basil, chili and eggs. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "129", "title": "Pineapple Fried Rice", "type": "fried rice", "description": "Fried rice with Hawaiian pineapple, onions, scallions, raisins, carrots, eggs and green peas garnished with roasted cashew nuts. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "130", "title": "Pad Thai", "type": "noodle dishes", "description": "Stir-fried Thai rice noodles with brown tofu, eggs, bean sprouts, scallions and crushed peanuts. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "131", "title": "Spicy Yaowarat Noodles", "type": "noodle dishes", "description": "Mee-J style. Stir-fried thick egg noodles with scallions, shiitake mushrooms and vegetables in spicy soy sauce. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "132", "title": "Pad See Euw", "type": "noodle dishes", "description": "Stir-fried flat rice noodles sauteed in sweet soy sauce with Asian broccoli and eggs. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "133", "title": "Roadside Noodles", "type": "noodle dishes", "description": "Steamed rice noodles with scallions, bean sprouts, crushed peanuts and house special thick brown sauce. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "134", "title": "Spicy Basil Noodles", "type": "noodle dishes", "description": "Kee-maow. Stir-fried flat rice noodles with tomatoes, basil, eggs, bell peppers and onions in a spicy basil sauce. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "135", "title": "Spicy Thai Basil", "type": "sauteed dishes", "description": "Sauteed fresh basil, fresh chili, string beans and onions with garlic and bell peppers. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "136", "title": "Pad Roasted Cashew Nut", "type": "sauteed dishes", "description": "Sauteed roasted cashew nuts with onions, bell peppers, celery, carrots and pineapple in chili paste. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "137", "title": "Rama Dish", "type": "sauteed dishes", "description": "Sauteed in a peanut sauce and served on a bed of steamed broccoli. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "138", "title": "Tamarind Dish", "type": "sauteed dishes", "description": "A hot and zesty tamarind-chili sauce with sweet peppers, broccoli, scallions and cilantro. Meat choice is battered and deep-fried. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "139", "title": "Ginger Dish", "type": "sauteed dishes", "description": "Sauteed fresh ginger with mushrooms and vegetables in oyster sauce. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "140", "title": "Red Curry", "type": "curry dishes", "description": "Thai spices blended in red chili paste with bamboo shoots, basil and bell peppers, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "141", "title": "Panang Curry", "type": "curry dishes", "description": "Thai herbs and spices blended in a mild chili paste with string beans, bell peppers and kaffir lime leaves, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "142", "title": "Green Curry", "type": "curry dishes", "description": "Thai spices blended in a hot green chili paste with bamboo shoots, basil and bell peppers, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "143", "title": "Massaman Curry", "type": "curry dishes", "description": "Southern Thai spices blended in chili paste with lotus seeds, potatoes, peanuts and onions, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
-  {"id": "144", "title": "Ba-Jangh", "type": "sides", "description": "Steamed sticky rice stuffed with soy beans, chestnuts, shiitake mushrooms, pork and Thai sausage wrapped in bamboo leaves. Served with black sweet ginger sesame sauce.", "price": "7" },
-  {"id": "145", "title": "Chinese Broccoli with Oyster Sauce", "type": "sides", "price": "7" },
-  {"id": "146", "title": "Mixed Marked Vegetables", "type": "sides", "description": "Stir-fried with green curry sauce.", "price": "6" },
-  {"id": "147", "title": "Black Sticky Rice", "type": "sides", "price": "2.5" },
-  {"id": "148", "title": "White Sticky Rice", "type": "sides", "price": "2.5" },
-  {"id": "149", "title": "Brown Rice", "type": "sides", "price": "2.5" },
-  {"id": "150", "title": "Jasmine Rice", "type": "sides", "price": "1.5" },
-  {"id": "151", "title": "Coconut Sticky Rice", "type": "sides", "price": "2.5" },
-  {"id": "152", "title": "O-Nieh Paeh-Guay", "type": "desserts", "description": "Warm, sweet mashed taro cake topped with ginkgos, red date fruit and lotus seeds in a cinnamon and a coconut milk sauce.", "price": "6.5" },
-  {"id": "153", "title": "Kao-Thom-Mud a La Mode", "type": "desserts", "description": "Steamed sweet sticky rice and banana wrapped in banana leaf. Served with coconut ice cream.", "price": "6.5"}
+  {"id": "100", "title": "Soft", "type": "beverages", "price": "250", "options": [["Coke", "Sprite", "Pepsi", "haven"]]},
+  {"id": "101", "title": "Coffee", "type": "beverages", "price": "200" },
+  {"id": "102", "title": "Juice", "type": "beverages", "price": "300", "options": [["Apple", "Orange", "Grape"]]},
+  {"id": "103", "title": "Water", "type": "beverages", "price": "400" },
+  //{"id": "104", "title": "Shiitake Spring Rolls", "type": "starters", "description": "Deep-fried spring rolls stuffed with glass noodles, shiitake mushrooms and minced vegetables. Served with pineapple carrot sauce.", "price": "4.5", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "105", "title": "Sesame Tofu", "type": "starters", "description": "Deep-fried sesame crusted tofu. Served with crushed peanuts in a sweet chili dipping sauce.", "price": "5", "options": [["Mild", "Medium", "Hot"]]},
+ // {"id": "106", "title": "Curry Puffs", "type": "starters", "description": "Siamese pastry stuffed with ground chicken, potatoes, onions, green peas and curry powder. Served with a light sour sauce.", "price": "6", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "107", "title": "Chicken Satay", "type": "starters", "description": "Grilled marinated chicken. Served with the house peanut sauce.", "price": "6.5", "options": [["Mild", "Medium", "Hot"]]},
+ // {"id": "108", "title": "Jeeb Dumplings", "type": "starters", "description": "Steamed mixed chicken and shrimp, served with house chili soy sauce.", "price": "5.5", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "109", "title": "Green Leaf Dumplings", "type": "starters", "description": "Spinach and mixed vegetables. Served with house chili soy sauce.", "price": "5.5", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "110", "title": "Chive Cakes", "type": "starters", "description": "Guiy-chaih. Fried Asian chive cakes. Served with black sweet ginger sauce.", "price": "6", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "111", "title": "Ba-Jangh", "type": "starters", "description": "Steamed sticky rice stuffed with soy beans, chestnuts, shiitake mushrooms, pork and Thai sausage wrapped in bamboo leaves. Served with black sweet ginger sauce.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "112", "title": "Shrimp Summer Rolls", "type": "starters", "description": "Poh-pieh-puuh. Steam shrimp, steamed bean sprout and shredded egg omelet served with tamarind hoisin sauce.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "113", "title": "Spicy Mango Soft Shell Crab", "type": "starters", "description": "Mieng-puuh. Served with red onions, mango, cherry tomatoes, roasted coconut, ginger and mint in chili lime dressing.", "price": "9", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "114", "title": "Fiery Thai Beef Tartare", "type": "starters", "description": "Larb-koiy. Steamed black sticky rice topped with freshly seasoned beef, chili and lime juice.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
+  //{"id": "115", "title": "Coconut Calamari", "type": "starters", "description": "Fried coconut crusted calamari, served with sweet chili sauce.", "price": "7", "options": [["Mild", "Medium", "Hot"]]},
+ // {"id": "116", "title": "Blanketed Shrimp", "type": "starters", "description": "Crispy blanketed shrimp and garlic chicken, served with pineapple-carrot sauce.", "price": "6.5", "options": [["Mild", "Medium", "Hot"]]},
+ // {"id": "117", "title": "Assorted Golden Fritters", "type": "starters", "description": "Crispy chicken and shrimp dumpling, shiitake spring rolls, blanketed shrimp and sesame tofu sticks. Served with crushed peanut sweet chili sauce.", "price": "8", "options": [["Mild", "Medium", "Hot"]]},
+  {"id": "118", "title": "Egusi Soup", "type": "soups", "description": "delicious egwusi soup prepaired for you, ", "price": "1700", "options": [["Mild", "Medium", "Hot"]]},
+  {"id": "119", "title": "Vegitable Soup", "type": "soups", "description": "beffey soup made with cinnamon soy sauce soup.", "price": "1600", "options": [["Mild", "Medium", "Hot"]]},
+  {"id": "120", "title": "Draw Soup", "type": "soups", "description": "take a teste of delicious flavor of southern nigeria's draw soup with mushrooms seasoned ", "price": "1500", "options": [["Mild", "Medium", "Hot"]]},
+  {"id": "121", "title": "Nigerian Salad", "type": "salads", "description": "Mixed market greens with bean sprouts, tomatoes, onions and carrot, served with light peanut sauce dressing.", "price": "600", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
+  {"id": "122", "title": "Green Papaya Salad", "type": "salads", "description": "Cherry tomatoes, string beans and ground roasted peanuts with chili lime dressing.", "price": "600", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
+  {"id": "123", "title": "Crispy Duck Salad", "type": "salads", "description": "Lettuce, cashew nuts, pineapple, red onions and tomatoes with chili lime dressing.", "price": "800", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
+ // {"id": "124", "title": "Crispy Mock Duck Salad", "type": "salads", "description": "Lettuce, cashew nuts, pineapples, red onions, tomatoes and chili lime dressing.", "price": "850", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
+ // {"id": "125", "title": "Avocado Mango Salad", "type": "salads", "description": "With red onions, roasted coconut, cashew nuts and fried shallots in chili lime dressing.", "price": "9", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
+ // {"id": "126", "title": "Beef Salad", "type": "salads", "description": "Slices of herb-marinated grilled steak tossed in lime juice, tomatoes, red onions, scallions and a bit of chili in roasted chili paste dressing.", "price": "8", "options": [["Peanut Dressing", "Chili Lime Dressing", "Chili Paste Dressing"]]},
+  {"id": "127", "title": "Fried Rice", "type": "Rice", "description": "Traditional fried rice with scallions, onions, tomatoes, green peas, carrots and eggs. Served with your choice of protein or vegetable.", "price": "1000", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+  {"id": "128", "title": "Nigerian Jellof Rice", "type": "Rice", "description": "traditional delicious Nigerian style with peppers, onions, basil, chili and eggs. Served with your choice of protein or vegetable.", "price": "1500", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+  {"id": "129", "title": "White Rice & Stew", "type": "Rice", "description": "white rice with  onions, scallions, raisins, carrots, eggs and green peas garnished with stw.", "price": "800", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+  {"id": "130", "title": "Indomiee", "type": "noodle dishes", "description": "Stir-fried Indomee noodles with eggs,. Served with your choice of protein or vegetable.", "price": "500", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+  {"id": "131", "title": "Spagety and Macrony", "type": "noodle dishes", "description": "Spagety and Macrony. Stir-fried thick egg noodles with scallions, shiitake mushrooms and vegetables in spicy soy sauce. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "132", "title": "Pad See Euw", "type": "noodle dishes", "description": "Stir-fried flat rice noodles sauteed in sweet soy sauce with Asian broccoli and eggs. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "133", "title": "Roadside Noodles", "type": "noodle dishes", "description": "Steamed rice noodles with scallions, bean sprouts, crushed peanuts and house special thick brown sauce. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "134", "title": "Spicy Basil Noodles", "type": "noodle dishes", "description": "Kee-maow. Stir-fried flat rice noodles with tomatoes, basil, eggs, bell peppers and onions in a spicy basil sauce. Served with your choice of protein or vegetable.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "135", "title": "Spicy Thai Basil", "type": "sauteed dishes", "description": "Sauteed fresh basil, fresh chili, string beans and onions with garlic and bell peppers. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "136", "title": "Pad Roasted Cashew Nut", "type": "sauteed dishes", "description": "Sauteed roasted cashew nuts with onions, bell peppers, celery, carrots and pineapple in chili paste. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "137", "title": "Rama Dish", "type": "sauteed dishes", "description": "Sauteed in a peanut sauce and served on a bed of steamed broccoli. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "138", "title": "Tamarind Dish", "type": "sauteed dishes", "description": "A hot and zesty tamarind-chili sauce with sweet peppers, broccoli, scallions and cilantro. Meat choice is battered and deep-fried. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "139", "title": "Ginger Dish", "type": "sauteed dishes", "description": "Sauteed fresh ginger with mushrooms and vegetables in oyster sauce. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+//  {"id": "140", "title": "Red Curry", "type": "curry dishes", "description": "Thai spices blended in red chili paste with bamboo shoots, basil and bell peppers, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+//  {"id": "141", "title": "Panang Curry", "type": "curry dishes", "description": "Thai herbs and spices blended in a mild chili paste with string beans, bell peppers and kaffir lime leaves, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "142", "title": "Green Curry", "type": "curry dishes", "description": "Thai spices blended in a hot green chili paste with bamboo shoots, basil and bell peppers, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "143", "title": "Massaman Curry", "type": "curry dishes", "description": "Southern Thai spices blended in chili paste with lotus seeds, potatoes, peanuts and onions, simmered in coconut milk. Served with your choice of protein or vegetable and rice.", "price": "10.5", "options": [["Beef", "Chicken", "Shrimp", "Duck", "Tofu", "Vegetable and Rice"], ["Mild", "Medium", "Hot"]]},
+ // {"id": "144", "title": "Ba-Jangh", "type": "sides", "description": "Steamed sticky rice stuffed with soy beans, chestnuts, shiitake mushrooms, pork and Thai sausage wrapped in bamboo leaves. Served with black sweet ginger sesame sauce.", "price": "7" },
+ // {"id": "145", "title": "Chinese Broccoli with Oyster Sauce", "type": "sides", "price": "7" },
+ // {"id": "146", "title": "Mixed Marked Vegetables", "type": "sides", "description": "Stir-fried with green curry sauce.", "price": "6" },
+ // {"id": "147", "title": "Black Sticky Rice", "type": "sides", "price": "2.5" },
+ // {"id": "148", "title": "White Sticky Rice", "type": "sides", "price": "2.5" },
+ // {"id": "149", "title": "Brown Rice", "type": "sides", "price": "2.5" },
+  //{"id": "150", "title": "Jasmine Rice", "type": "sides", "price": "1.5" },
+  //{"id": "151", "title": "Coconut Sticky Rice", "type": "sides", "price": "2.5" },
+  {"id": "152", "title": "Meat Pie", "type": "desserts", "description": "", "price": "600" },
+  {"id": "153", "title": "Donots", "type": "desserts", "description": "served with coconut ice cream.", "price": "300"}
 ];
 
 module.exports = data;
