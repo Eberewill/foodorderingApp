@@ -875,7 +875,7 @@ var PayForm = React.createClass({displayName: "PayForm",
 			  React.createElement("h4", {className: "sixth pct"}, "₦",  (totalPrice ) ), 
 			  localStorage.setItem("totalPrice", totalPrice),
 			  
-
+/** 
 			  React.createElement("h5", {className: "warning"}, "we are not recieving online payment now" ), 
               React.createElement("input", {name: "cardnum", 
                 type: "number", 
@@ -905,7 +905,7 @@ var PayForm = React.createClass({displayName: "PayForm",
                 type: "text", 
                 valueLink: this.linkState('cardholdername'), 
                 placeholder: "Cardholder Name", 
-                disabled: true}), 
+                disabled: true}), */
               React.createElement("button", null, "PLACE ORDER")
             )
           )
@@ -950,10 +950,10 @@ var OrderItem = React.createClass({displayName: "OrderItem",
       suffix = 's'
     }
     return (
-      React.createElement("tr", {className: "order-info"}, 
-        React.createElement("td", {className: "item-numOrdered item-info"}, model.numOrdered, " order  ", suffix, "  "), 
-		React.createElement("th", {className: "item-title item-info"}, model.title), 
-        React.createElement("td", {className: "item-options item-info"}, 
+      React.createElement("li", {className: "order-info"}, 
+        React.createElement("div", {className: "item-numOrdered item-info"}, model.numOrdered, " order  ", suffix, "  "), 
+		React.createElement("div", {className: "item-title item-info"}, model.title), 
+        React.createElement("div", {className: "item-options item-info"}, 
           options
         )
       )
@@ -963,16 +963,57 @@ var OrderItem = React.createClass({displayName: "OrderItem",
 
 
 var ThaiTracker =  React.createClass({displayName: "ThaiTracker",
+
+
 render: function(){
+
 
 	var order = JSON.parse(localStorage.getItem('order'));
 	var totalPrice = localStorage.getItem('totalPrice')
+	
 	 var orderKey = 0;
 	 var orderobj = order.order;
 	var orderItems = orderobj.map(function(model){
 		orderKey += 1;
 		return ( React.createElement( OrderItem, {model: model, key:  orderKey }) );
 	  })
+	  
+	  function payWithPaystack(){
+		var handler = PaystackPop.setup({
+		  key: 'pk_test_844eaa22b8ac7b8a090cb56488d47e311bb564c2',
+		  email: order.customer.email,
+		  amount: totalPrice*100,
+		  currency: "NGN",
+		  ref: ''+Math.floor((Math.random() * 1000000000) + 1), // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+		  metadata: {
+			 custom_fields: [
+				{
+					display_name: "Mobile Number",
+					variable_name: "mobile_number",
+					value: "+2347062630902"
+				}
+			 ]
+		  },
+		  callback: function(response){
+			 successBuy(response.reference)
+			 //localStorage.setItem("pstatus",`Paid with Refference: ${response.reference}`);
+			 //alert('success. transaction refresh');
+		  },
+		  onClose: function(){
+			  alert('window closed');
+		  }
+		});
+		handler.openIframe();
+	  }
+
+	  
+var SuccessBuy = React.createClass({diplayName: "SuccessBuy",
+render:function successBuy(ref){
+	return(
+		React.createElement("div", {className: "customer-email customer"}, `Paid with Refference: ${ref}`)
+	)
+}
+});
    return (
 React.createElement("div", {className: "container-fluid info-holder"}, 
  console.log(order),
@@ -995,13 +1036,24 @@ React.createElement("div", {className: "container-fluid info-holder"},
           			React.createElement("div", {className: "customer-email customer"}, "Email: ", order.customer.email),
 					 React.createElement("div", {className: "divider"}), 
 					 React.createElement("div", {id: "order-order-info"}, 
-          			React.createElement("div", null, orderItems)
+          			React.createElement("ul", null, orderItems)
         			),
 
 					  )),
 
 					  React.createElement("div", {className: "divider"}), 
 					  React.createElement("div", {className: "customer-email customer"}, "Total: ", " ₦ "," ", totalPrice),
+					  React.createElement("div", {className: "divider"}), 
+					  React.createElement("br", null ),
+					 
+					  React.createElement("div", null, "Order Status: ", " "," ", SuccessBuy),
+					  React.createElement("div", null, SuccessBuy),
+					 
+
+
+					  React.createElement("div", {className: "divider"}),
+					  React.createElement("br", {className: "customer-email customer"}," " ),
+					  React.createElement("button", {id: "order-now", type: "submit", onClick:() => payWithPaystack() }, "Pay with Paystack")
 				   )
 				 )
 			   )
